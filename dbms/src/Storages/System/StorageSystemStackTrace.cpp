@@ -4,7 +4,7 @@
 #include <poll.h>
 
 #include <mutex>
-#include <filesystem>
+
 
 #include <ext/scope_guard.h>
 
@@ -16,6 +16,13 @@
 #include <Common/PipeFDs.h>
 #include <common/getThreadNumber.h>
 
+#ifdef OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 namespace DB
 {
@@ -169,8 +176,8 @@ void StorageSystemStackTrace::fillData(MutableColumns & res_columns, const Conte
 
     /// There is no better way to enumerate threads in a process other than looking into procfs.
 
-    std::filesystem::directory_iterator end;
-    for (std::filesystem::directory_iterator it("/proc/self/task"); it != end; ++it)
+    fs:directory_iterator end;
+    for (fs::directory_iterator it("/proc/self/task"); it != end; ++it)
     {
         pid_t tid = parse<pid_t>(it->path().filename());
 

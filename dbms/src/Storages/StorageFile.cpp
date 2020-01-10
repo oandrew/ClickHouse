@@ -32,7 +32,13 @@
 #include <re2/re2.h>
 #include <filesystem>
 
+#ifdef OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
+#include <filesystem>
 namespace fs = std::filesystem;
+#endif
 
 namespace DB
 {

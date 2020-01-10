@@ -36,14 +36,14 @@ std::unique_ptr<TemporaryFile> createTemporaryFile(const std::string & path)
     return std::make_unique<TemporaryFile>(path);
 }
 
-std::filesystem::path getMountPoint(std::filesystem::path absolute_path)
+fs::path getMountPoint(fs::path absolute_path)
 {
     if (absolute_path.is_relative())
         throw Exception("Path is relative. It's a bug.", ErrorCodes::LOGICAL_ERROR);
 
-    absolute_path = std::filesystem::canonical(absolute_path);
+    absolute_path = fs::canonical(absolute_path);
 
-    const auto get_device_id = [](const std::filesystem::path & p)
+    const auto get_device_id = [](const fs::path & p)
     {
         struct stat st;
         if (stat(p.c_str(), &st))

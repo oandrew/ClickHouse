@@ -5,9 +5,16 @@
 #include <IO/ReadHelpers.h>
 #include <IO/WriteBufferFromFile.h>
 #include "applySubstitutions.h"
-#include <filesystem>
+
 #include <iostream>
 
+#ifdef OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 namespace DB
 {
@@ -41,7 +48,6 @@ void extractSettings(
 }
 
 
-namespace fs = std::filesystem;
 
 PerformanceTestInfo::PerformanceTestInfo(
     XMLConfigurationPtr config,

@@ -5,25 +5,33 @@
 #include <filesystem>
 #include <Poco/Util/AbstractConfiguration.h>
 
+#ifdef OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 namespace DB
 {
 
 struct FilesystemAvailable
 {
     static constexpr auto name = "filesystemAvailable";
-    static std::uintmax_t get(std::filesystem::space_info & spaceinfo) { return spaceinfo.available; }
+    static std::uintmax_t get(fs::space_info & spaceinfo) { return spaceinfo.available; }
 };
 
 struct FilesystemFree
 {
     static constexpr auto name = "filesystemFree";
-    static std::uintmax_t get(std::filesystem::space_info & spaceinfo) { return spaceinfo.free; }
+    static std::uintmax_t get(fs::space_info & spaceinfo) { return spaceinfo.free; }
 };
 
 struct FilesystemCapacity
 {
     static constexpr auto name = "filesystemCapacity";
-    static std::uintmax_t get(std::filesystem::space_info & spaceinfo) { return spaceinfo.capacity; }
+    static std::uintmax_t get(fs::space_info & spaceinfo) { return spaceinfo.capacity; }
 };
 
 template <typename Impl>
@@ -34,10 +42,10 @@ public:
 
     static FunctionPtr create(const Context & context)
     {
-        return std::make_shared<FilesystemImpl<Impl>>(std::filesystem::space(context.getConfigRef().getString("path")));
+        return std::make_shared<FilesystemImpl<Impl>>(fs::space(context.getConfigRef().getString("path")));
     }
 
-    explicit FilesystemImpl(std::filesystem::space_info spaceinfo_) : spaceinfo(spaceinfo_) { }
+    explicit FilesystemImpl(fs::space_info spaceinfo_) : spaceinfo(spaceinfo_) { }
 
     String getName() const override { return name; }
     size_t getNumberOfArguments() const override { return 0; }
@@ -54,7 +62,7 @@ public:
     }
 
 private:
-    std::filesystem::space_info spaceinfo;
+    fs::space_info spaceinfo;
 };
 
 

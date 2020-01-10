@@ -12,7 +12,13 @@
 #include <IO/ReadHelpers.h>
 #include <IO/WriteBufferFromFile.h>
 
+#ifdef OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
 #include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 #include "executeQuery.h"
 
@@ -52,7 +58,6 @@ void waitQuery(Connection & connection)
 }
 }
 
-namespace fs = std::filesystem;
 
 PerformanceTest::PerformanceTest(
     const XMLConfigurationPtr & config_,

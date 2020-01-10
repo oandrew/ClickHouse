@@ -11,7 +11,7 @@
 #include <Common/config_version.h>
 #include <Common/formatReadable.h>
 #include <Common/filesystemHelpers.h>
-#include <filesystem>
+
 
 namespace DB
 {
@@ -125,15 +125,15 @@ void tryLogCurrentException(Poco::Logger * logger, const std::string & start_of_
     }
 }
 
-static void getNoSpaceLeftInfoMessage(std::filesystem::path path, std::string & msg)
+static void getNoSpaceLeftInfoMessage(fs::path path, std::string & msg)
 {
-    path = std::filesystem::absolute(path);
+    path = fs::absolute(path);
     /// It's possible to get ENOSPC for non existent file (e.g. if there are no free inodes and creat() fails)
     /// So try to get info for existent parent directory.
-    while (!std::filesystem::exists(path) && path.has_relative_path())
+    while (!fs::exists(path) && path.has_relative_path())
         path = path.parent_path();
 
-    auto fs = getStatVFS(path);
+    auto fs = getStatVFS(path.native());
     msg += "\nTotal space: "      + formatReadableSizeWithBinarySuffix(fs.f_blocks * fs.f_bsize)
          + "\nAvailable space: "  + formatReadableSizeWithBinarySuffix(fs.f_bavail * fs.f_bsize)
          + "\nTotal inodes: "     + formatReadableQuantity(fs.f_files)

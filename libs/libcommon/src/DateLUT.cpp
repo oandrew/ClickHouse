@@ -1,11 +1,17 @@
 #include <common/DateLUT.h>
 
-#include <filesystem>
 #include <Poco/Exception.h>
 #include <Poco/SHA1Engine.h>
 #include <Poco/DigestStream.h>
 #include <fstream>
 
+#if OS_DARWIN
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
 
 namespace
 {
@@ -26,7 +32,6 @@ Poco::DigestEngine::Digest calcSHA1(const std::string & path)
 
 std::string determineDefaultTimeZone()
 {
-    namespace fs = std::filesystem;
 
     const char * tzdir_env_var = std::getenv("TZDIR");
     fs::path tz_database_path = tzdir_env_var ? tzdir_env_var : "/usr/share/zoneinfo/";
